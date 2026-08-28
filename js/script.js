@@ -4,28 +4,79 @@ let valorcarrinho =0
 
 //redenrizaçao de produtos
 async function renderizarProdutos() {
-    const containerNike = document.getElementById('container-nike');
-    const containerAdidas = document.getElementById('container-adidas');
+    const containers = {
+    'camisetas': document.getElementById('container-camisetas'),
+    'tenis': document.getElementById('container-tenis'),
+    'calcas': document.getElementById('container-calcas'),
+    'acessorios': document.getElementById('container-acessorios'),
+    'moletons': document.getElementById('container-moletons')
+};
 
-    // 1. Busca os dados no Supabase (usando a variável 'db' do seu config)
-    const { data: produtos, error } = await db
-        .from('produtos')
-        .select('*');
+    const [produtosResult, tamanhosResult] = await Promise.all([
+        db.from('produtos').select('*'),
+        db.from('tamanhos_padrao').select('categoria, tamanho')
+    ]);
 
-    if (error) {
-        console.error("Erro ao carregar produtos:", error.message);
+    const { data: produtos, error } = produtosResult;
+    const { data: tamanhosPadrao, error: tamanhosError } = tamanhosResult;
+
+    if (error || tamanhosError) {
+        console.error(
+            'Erro ao carregar dados:',
+            error?.message || tamanhosError?.message
+        );
         return;
     }
 
-    // Limpa os containers antes de renderizar
-    containerNike.innerHTML = "";
-    containerAdidas.innerHTML = "";
+    Object.values(containers).forEach(container => {
+        if (container) {
+            container.innerHTML = '';
+        }
+    });
+
+    const normalizarCategoria = categoria => categoria
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    const categoriaProdutoParaTabela = {
+        camisetas: 'camisas',
+        calcas: 'camisas',
+        moleton: 'moletons',
+        moletons: 'moletons',
+        tenis: 'sapatos',
+        acessorios: 'acessorio',
+       
+    };
+
+    const tamanhosPorCategoria = tamanhosPadrao.reduce((grupos, item) => {
+        const categoria = normalizarCategoria(item.categoria);
+        if (!grupos[categoria]) {
+            grupos[categoria] = [];
+        }
+        grupos[categoria].push(item.tamanho);
+        return grupos;
+    }, {});
 
     // 2. Faz o loop nos produtos
     produtos.forEach(produto => {
         // Cria o HTML do card exatamente como o seu estilo original
-         // Se o produto NÃO estiver em estoque (!produto.em_estoque), então ele está esgotado (true)
-        const isEsgotado = !produto.em_estoque;
+         // Se o produto estiver inativo, ele está esgotado.
+        const isEsgotado = !produto.ativo;
+        const categoriaNormalizada = normalizarCategoria(produto.categoria);
+        const categoriaTabela = categoriaProdutoParaTabela[categoriaNormalizada]
+            || categoriaNormalizada;
+        const tamanhos = tamanhosPorCategoria[categoriaTabela] || [];
+        const opcoesTamanho = tamanhos.map((tamanho, index) => `
+            <input
+                type="radio"
+                name="size-${produto.id}"
+                id="size-${produto.id}-${index}"
+                value="${tamanho}"
+                ${isEsgotado ? 'disabled' : ''}
+            >
+            <label for="size-${produto.id}-${index}">${tamanho}</label>
+        `).join('');
         const cardHTML = `
                 <div class="card-produto ${isEsgotado ? 'produto-esgotado' : ''}">
                     <div class="img-card">
@@ -38,32 +89,13 @@ async function renderizarProdutos() {
                         <div class="selecao">
                             <span>Tamanho:</span>
                             <div class="opcao">
-                                <input type="radio" name="size-${produto.id}" id="p-${produto.id}" value="P" ${isEsgotado ? 'disabled' : ''}><label for="p-${produto.id}">P</label>
-                                <input type="radio" name="size-${produto.id}" id="m-${produto.id}" value="M" ${isEsgotado ? 'disabled' : ''}><label for="m-${produto.id}">M</label>
-                                <input type="radio" name="size-${produto.id}" id="g-${produto.id}" value="G" ${isEsgotado ? 'disabled' : ''}><label for="g-${produto.id}">G</label>
-                                <input type="radio" name="size-${produto.id}" id="gg-${produto.id}" value="GG" ${isEsgotado ? 'disabled' : ''}><label for="gg-${produto.id}">GG</label>
+                                <div class="opcao-conteudo">
+                                    ${opcoesTamanho}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="selecao">
-                            <span>Cor:</span>
-                            <div class="opicao-cores">
-                                <input type="radio" name="color-${produto.id}" id="preto-${produto.id}" value="preto" ${isEsgotado ? 'disabled' : ''}>
-                                <label for="preto-${produto.id}" style="background-color: black;"></label>
-
-                                <input type="radio" name="color-${produto.id}" id="branco-${produto.id}" value="branco" ${isEsgotado ? 'disabled' : ''}>
-                                <label for="branco-${produto.id}" style="background-color: white; border: 1px solid #ddd;"></label>
-
-                                <input type="radio" name="color-${produto.id}" id="cinza-${produto.id}" value="cinza" ${isEsgotado ? 'disabled' : ''}>
-                                <label for="cinza-${produto.id}" style="background-color: gray;"></label>
-
-                                <input type="radio" name="color-${produto.id}" id="vermelho-${produto.id}" value="vermelho" ${isEsgotado ? 'disabled' : ''}>
-                                <label for="vermelho-${produto.id}" style="background-color: red;"></label>
-
-                                <input type="radio" name="color-${produto.id}" id="azul-${produto.id}" value="azul" ${isEsgotado ? 'disabled' : ''}>
-                                <label for="azul-${produto.id}" style="background-color: #00008B;"></label>
-                            </div>
-                        </div>
+                        
                         
                         <button 
                             class="btn-adc-carrinho" 
@@ -76,14 +108,18 @@ async function renderizarProdutos() {
                 </div>
             `;
 
-        // 3. Filtra por marca para saber onde injetar
-        if (produto.marca.toLowerCase() === 'nike') {
-            containerNike.innerHTML += cardHTML;
-        } else if (produto.marca.toLowerCase() === 'adidas') {
-            containerAdidas.innerHTML += cardHTML;
+        // Normaliza as categorias salvas no banco para os IDs dos containers.
+        const categoria = categoriaNormalizada === 'moleton'
+            ? 'moletons'
+            : categoriaNormalizada;
+
+        if (containers[categoria]) {
+            containers[categoria].innerHTML += cardHTML;
         }
     });
-    mostrarsecao('container-nike');
+    const primeiraCategoriaComProdutos = Object.entries(containers)
+        .find(([, container]) => container?.children.length > 0);
+    mostrarsecao(primeiraCategoriaComProdutos?.[1]?.id || 'container-camisetas');
 }
 
 document.addEventListener('DOMContentLoaded', renderizarProdutos);
@@ -123,23 +159,30 @@ window.onclick = function(event) {
 
 
 
-let carrinho = JSON.parse(localStorage.getItem('carrinho_vianna')) || [];
+let carrinho = JSON.parse(localStorage.getItem('carrinho_krstore')) || [];
 
 function adicionarAoCarrinho(id, nome, preco, imagem,elementoCard) {
-    const tamanho = elementoCard.querySelector('.opcao input:checked')?.value;
-    const cor = elementoCard.querySelector('.opicao-cores input:checked')?.value;
+    let tamanho = elementoCard.querySelector('.opcao input:checked')?.value;
+    const tamanhoDisponivel = elementoCard.querySelector('.opcao input')?.value;
+   
     // Verifica se o produto já está no carrinho
    // Criamos uma chave única para o item (mesmo ID com tamanhos diferentes são itens separados)
-   if (!tamanho || !cor) {
+   // 2. Se não marcou tamanho, mas o tamanho disponível for "UNC", assume esse valor automaticamente
+    if (!tamanho && tamanhoDisponivel === 'UNC') {
+        tamanho = tamanhoDisponivel;
+    }
+    
+
+    if (!tamanho) {
          Swal.fire({
             icon: 'warning',
             title: 'Escolha as opções',
-            text: 'Selecione um tamanho e uma cor antes de adicionar!',
+            text: 'Selecione um tamanho antes de adicionar!',
             confirmButtonColor: '#fb1601'
         });
-        return;
+        return tamanho=tamanhoDisponivel;
     }
-    const itemChave = `${id}-${tamanho}-${cor}`;
+    const itemChave = `${id}-${tamanho}`;
     const itemExistente = carrinho.find(item => item.chave === itemChave);
     
     
@@ -153,7 +196,6 @@ function adicionarAoCarrinho(id, nome, preco, imagem,elementoCard) {
             preco: preco,
             imagem: imagem,
             tamanho: tamanho,
-            cor: cor,
             quantidade: 1
         };
         carrinho.push(novoItem);
@@ -174,7 +216,7 @@ function adicionarAoCarrinho(id, nome, preco, imagem,elementoCard) {
 }
 
 function salvarCarrinho() {
-    localStorage.setItem('carrinho_vianna', JSON.stringify(carrinho));
+    localStorage.setItem('carrinho_krstore', JSON.stringify(carrinho));
 }
 
 
@@ -186,8 +228,8 @@ function atualizarInterfaceCarrinho() {
     containerItens.innerHTML = '';
     let totalGeral = 0;
     let totalItens = 0;
-    let precopromo = 30
-    carrinho.forEach((item, index) => {
+
+    carrinho.forEach(item => {
         totalGeral += item.preco * item.quantidade;
         totalItens += item.quantidade;
        
@@ -198,52 +240,18 @@ function atualizarInterfaceCarrinho() {
         <img src="${item.imagem}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
         <div style="flex: 1;">
             <p style="font-size: 12px; font-weight: bold; margin: 0;">${item.nome}</p>
-            <p style="font-size: 11px; color: #666; margin: 2px 0;">Tam: ${item.tamanho} | Cor: ${item.cor}</p>
+            <p style="font-size: 11px; color: #666; margin: 2px 0;">Tam: ${item.tamanho}</p>
             <p style="font-size: 12px; margin: 0;">${item.quantidade}x R$ ${item.preco.toFixed(2)}</p>
         </div>
         <button onclick="removerDoCarrinho('${item.chave}')" style="background: none; border: none; color: #fb1601; cursor: pointer;">
             <span class="material-symbols-outlined">delete</span>
         </button>
     </div>
-`});
-   let ultimaPromoAtivada = 0;
-   
-  let htmlPromo = '';
+`;
+    });
 
-    // --- LÓGICA DE PROMOÇÃO E FRASE DE SUCESSO ---
-    if (totalItens === 3) {
-        totalGeral = 100.00;
-        htmlPromo = `
-            <div style="background-color: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 11px; font-weight: bold; border: 1px solid #2e7d32;">
-                🔥 PARABÉNS! Você garantiu a promoção: 3 peças por R$ 100,00!
-            </div>`;
-        
-        if (ultimaPromoAtivada !== 3) {
-            lancarToastPromo("3 Peças por R$ 100,00! 🔥");
-            ultimaPromoAtivada = 3;
-        }
-    } 
-    else if (totalItens >= 4) {
 
-        totalGeral=precopromo*totalItens
-        htmlPromo = `
-            <div style="background-color: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 11px; font-weight: bold; border: 1px solid #2e7d32;">
-                🚀 INCRÍVEL! Promoção ativada: Apartir de 4 peças sai R$ 30,00 p/unidade!
-            </div>`;
-            
-        if (ultimaPromoAtivada !== 4) {
-            lancarToastPromo("4 Peças por R$ 120,00! 🚀");
-            ultimaPromoAtivada = 4;
-        }
-    } else {
-        ultimaPromoAtivada = 0;
-    }
-
-    // Renderiza a frase de promoção logo acima do total, se houver
   
-    if (htmlPromo !== '') {
-        containerItens.innerHTML += htmlPromo;
-    }
 
     // ... (resto do código de atualização do totalElemento e contador)
     contador.innerHTML = totalItens;
@@ -253,7 +261,7 @@ function atualizarInterfaceCarrinho() {
 }
 
 function removerDoCarrinho(index) {
-    carrinho.splice(index, 1);
+    carrinho = carrinho.filter(item => item.chave !== index);
     salvarCarrinho();
     atualizarInterfaceCarrinho();
 }
@@ -262,26 +270,35 @@ function removerDoCarrinho(index) {
 document.addEventListener('DOMContentLoaded', atualizarInterfaceCarrinho);
 
 //funçao lançar toast promoçao
-function lancarToastPromo(mensagem) {
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-        background: '#fb1601', // Cor vermelha da sua marca
-        color: '#ffffff'
-    });
 
-    Toast.fire({
-        icon: 'info', // Ícone de informação/anúncio
-        iconColor: '#ffffff',
-        title: mensagem
-    });
-}
-function finalizarCarrinho(){
-  const carrinhostorege = valorcarrinho
-   localStorage.setItem('valorcarrinho', carrinhostorege)
-   window.location.href='pagamento.html'
-   
+function finalizarCarrinho() {
+    if (carrinho.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Carrinho vazio',
+            text: 'Adicione pelo menos um produto antes de finalizar o pedido.',
+            confirmButtonColor: '#000000'
+        });
+        return;
+    }
+
+    const total = carrinho.reduce(
+        (soma, item) => soma + item.preco * item.quantidade,
+        0
+    );
+    const itens = carrinho.map(item => {
+        const subtotal = item.preco * item.quantidade;
+        return `${item.quantidade}x ${item.nome} - Tamanho: ${item.tamanho} - R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    }).join('\n');
+
+    const mensagem = [
+        'Olá! Gostaria de fazer este pedido:',
+        '',
+        itens,
+        '',
+        `Total: R$ ${total.toFixed(2).replace('.', ',')}`
+    ].join('\n');
+
+    const urlWhatsApp = `https://wa.me/5515997649896?text=${encodeURIComponent(mensagem)}`;
+    window.open(urlWhatsApp, '_blank');
 }

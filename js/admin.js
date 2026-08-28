@@ -1,6 +1,7 @@
 // Verifica se o usuário está logado logo ao carregar a página
 async function checkSession() {
     const { data: { session } } = await db.auth.getSession();
+  
     
     if (!session) {
         window.location.href = "login.html";
@@ -21,10 +22,10 @@ async function handleLogout() {
 async function handleAddProduct() {
     const nome = document.querySelector('#nome-produto').value;
     const preco = document.querySelector('#preco-produto').value;
-    const marca = document.querySelector('#marca-produto').value;
+    const categoria = document.querySelector('#marca-produto').value;
     const fotoArquivo = document.getElementById('foto-produto').files[0];
   
-if (!nome || !preco || !marca || !fotoArquivo) {
+if (!nome || !preco || !categoria || !fotoArquivo) {
     Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -53,16 +54,17 @@ try {
         const { error: dbError } = await db
             .from('produtos')
             .insert([
-                { nome, marca, preco: parseFloat(preco), imagem_url: fotoUrl }
+                { nome, categoria, preco: parseFloat(preco), imagem_url: fotoUrl }
             ]);
 
         if (dbError) throw dbError;
 
-        Swal.fire({
+        await Swal.fire({
             title: "Sucesso!",
             text: "Produto cadastrado com sucesso!",
             icon: "success",
-            timer:1000
+            timer: 1000,
+            showConfirmButton: false
         });
         location.reload(); // Recarrega para limpar os campos
 
@@ -104,7 +106,7 @@ async function renderizarOptionsProdutos() {
     // 1. Busca os produtos no Supabase (ajuste 'produtos' para o nome da sua tabela)
     const { data: produtos, error } = await db
         .from('produtos') 
-        .select('id, nome, preco, em_estoque');
+        .select('id, nome, preco, ativo');
 
     if (error) {
         console.error('Erro ao buscar produtos:', error.message);
@@ -131,7 +133,7 @@ async function renderizarOptionsProdutos() {
         // Option para o select de Estoque
         const optionEstoque = document.createElement('option');
         optionEstoque.value = produto.id;
-        optionEstoque.textContent = `${produto.nome} - status atual > ${produto.em_estoque}`;
+        optionEstoque.textContent = `${produto.nome} - status atual > ${produto.ativo}`;
         selectEstoque.appendChild(optionEstoque);
     });
 }
@@ -203,7 +205,7 @@ async function statusProduto() {
 
      const{ error: updateError} = await db
       .from('produtos')
-      .update({em_estoque: opcaostatus})
+        .update({ ativo: opcaostatus === 'true' })
       .eq('id', opcaoselecionada)
 
       if(updateError){

@@ -3,8 +3,9 @@
 
 :root{
   --cor-primaria:#000000;
-  --cor-secundaria:#fb1601;
+  --cor-secundaria:#ffd900;
   --cor-branca-font:white;
+  --cor-nav-carrosel:#B5B9F0;
 
 
 
@@ -35,7 +36,7 @@ header{
 .marquee-container {
   width: 100%;
   overflow: hidden; 
-  background-color: var(--cor-secundaria); 
+  background-color: var(--cor-nav-carrosel); 
   color: var(--cor-primaria); 
   padding: 10px 0;
   white-space: nowrap; 
@@ -84,17 +85,19 @@ header{
 /* navegaçao marcas */
 .marcas {
   margin-top: 20px;
-  
+  margin-left: 0px;
+  padding-left: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 35px;
+  overflow-x: auto;
 }
 .marcas > span{
   background-color: var(--cor-primaria);
   color:var(--cor-branca-font) ;
   padding: 5px 15px;
-  letter-spacing: 4px;
+ 
   border-radius: 15px;
   cursor: pointer;
   box-shadow: 0px 2px 9px 0px gray;
@@ -167,12 +170,23 @@ section{
 .preco{
   font-size: 2em;
 }
-
+.opcao-conteudo {
+  display: flex;         /* Coloca os tamanhos lado a lado */
+  gap: 8px;              /* Espaçamento entre P, M, G, GG... */
+  width: max-content;    /* AQUI: Força a div a ter exatamente a largura total de todos os botões/textos */
+}
 
 .opcao {
     display: flex;
     gap: 10px;
     margin-top: 5px;
+    overflow-x: auto;
+  
+
+  
+}
+.container::-webkit-scrollbar {
+  display: none;
 }
 
 .opcao input[type="radio"] { display: none; }
@@ -194,6 +208,8 @@ section{
     background-color: var(--cor-primaria);
     color: var(--cor-branca-font);
     border-color: var(--cor-primaria);
+    
+
 }
 .opicao-cores {
     display: flex;
@@ -251,7 +267,7 @@ section{
 }
 .carrinho{
     color: white;
-    font-size: 30px;
+    font-size: 35px;
     padding-left: 15px;
 }
 .cardcout{
@@ -263,7 +279,7 @@ section{
 
 }
 .contador{
-    color: white;
+    color:#000000;
     position:absolute ;
     top: -5px;
     right: -5px;
@@ -312,16 +328,20 @@ span{
 
 }
 .slider figure:nth-child(1){
-  background-image: url(imagens/promocao.jpg);
+  background-image: url(imagens/slide1-desktop.jpg);
   animation-delay: 0s;
+  background-size: cover;
 }
+ 
 .slider figure:nth-child(2){
-  background-image: url(imagens/model1.jpg);
+  background-image: url(imagens/slide2-desktop.jpg);
   animation-delay: 4s;
+  background-size: cover;
 }
 .slider figure:nth-child(3){
-  background-image: url(imagens/model1.jpg);
+  background-image: url(imagens/slide3-desktop.jpg);
   animation-delay: 8s;
+  background-size: cover;
 }
 @keyframes slide {
   0% {transform: translateX(100%);}
@@ -496,7 +516,7 @@ span{
 /* Efeito de hover nos ícones (fica com a cor da sua marca, se preferir mude para o red do checkout) */
 .social-links a:hover {
     transform: translateY(-5px) scale(1.1);
-    color: #d01201; /* Coloquei a mesma cor de destaque do seu botão do checkout */
+    color: var(--cor-nav-carrosel); /* Coloquei a mesma cor de destaque do seu botão do checkout */
 }
 
 .footer-copyright {
@@ -511,6 +531,30 @@ span{
 
 /* telas menores*/
 @media(max-width:768px){
+    .marcas{
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 0 12px;
+    }
+
+    .marcas > span{
+      flex-shrink: 0;
+    }
+
+    .cards-Produtos{
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 12px;
+    }
+
+    .card-produto{
+      width: min(280px, 100%);
+    }
+
     .logo{
     margin: -30px;
     position: absolute;
@@ -532,7 +576,21 @@ span{
   width: 90%;
   max-width: 350px;
 }
-
+slider figure:nth-child(1){
+  background-image: url(imagens/slide1-mobile.jpg);
+  animation-delay: 0s;
+  background-position: center center;
+  background-size: cover;
+}
+.slider figure:nth-child(2){
+  background-image: url(imagens/slide2-mobile.jpg);
+  animation-delay: 4s;
+  background-position: center center;
+}
+.slider figure:nth-child(3){
+  background-image: url(imagens/slide3-mobile.jpg);
+  animation-delay: 8s;
+}
 
     
 }
