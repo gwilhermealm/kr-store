@@ -10,7 +10,35 @@
 </head>
 <body>
     <header>
-        <span class="material-symbols-outlined menu">menu</span>
+        <span class="material-symbols-outlined menu"  onclick="abrirFecharMenu()">menu</span>
+        <!---menu lateral-->
+        <div id="overlay-menu" class="menu-overlay hidden" onclick="abrirFecharMenu()"></div>
+
+        <aside id="menu-lateral" class="menu-close hidden">
+            <div class="menu-header">
+                <h2>Menu</h2>
+                <button onclick="abrirFecharMenu()">X</button>
+            </div>
+            <nav class="menu-links">
+                <a href="#" onclick="mostrarsecao('container-camisetas'); abrirFecharMenu();">CAMISETAS</a>
+                <a href="#" onclick="mostrarsecao('container-calcas'); abrirFecharMenu();">CALÇAS</a>
+                <a href="#" onclick="mostrarsecao('container-bone'); abrirFecharMenu();">BONÉS</a>
+                <a href="#" onclick="mostrarsecao('container-polo'); abrirFecharMenu();">CAMISA POLO</a>
+                <a href="#" onclick="mostrarsecao('container-regatas'); abrirFecharMenu();">REGATAS</a>
+                <a href="#" onclick="mostrarsecao('container-longa'); abrirFecharMenu();">CAMISA MANGA LONGA</a>
+                <a href="#" onclick="mostrarsecao('container-chinelos'); abrirFecharMenu();">CHINELOS</a>
+                <a href="#" onclick="mostrarsecao('container-bermuda'); abrirFecharMenu();">BERMUDA JEANS</a>
+                <a href="#" onclick="mostrarsecao('container-shorts'); abrirFecharMenu();">SHORTS</a>
+                <a href="#" onclick="mostrarsecao('container-tenis'); abrirFecharMenu();">TÊNIS</a>
+                <a href="#" onclick="mostrarsecao('container-moletons'); abrirFecharMenu();">MOLETONS</a>
+                <a href="#" onclick="mostrarsecao('container-acessorios'); abrirFecharMenu();">ACESSÓRIOS</a>
+            </nav>
+        </aside>
+
+
+
+
+
         <span class="logo"><img src="imagens/logo-horizontal.png" alt="logo" style="width: 250px; height:auto;"></span>
         <div class="cardcout" onclick="abrirFecharCarrinho()">
             <span class="material-symbols-outlined carrinho">shopping_bag</span>
@@ -40,7 +68,6 @@
     <section class="slider">
         <figure></figure>
         <figure></figure>
-        <figure></figure> 
     </section>
     <!--span anuncio de entrega-->
     <div class="marquee-container">
@@ -65,11 +92,19 @@
     </div>
     <!------------------------->
     <nav class="marcas">
-        <span onclick="mostrarsecao('container-camisetas')" style="padding: 5px 30px; letter-spacing: 5px ; ">CAMISETAS</span>
+        <span onclick="mostrarsecao('container-camisetas')">CAMISETAS</span>
         <span onclick="mostrarsecao('container-calcas')">CALÇAS</span>
-         <span onclick="mostrarsecao('container-tenis')" style="padding: 5px 30px; letter-spacing: 5px ; ">TENIS</span>
+        <span  onclick="mostrarsecao('container-bone')">BONÉS</span>
+        <span onclick="mostrarsecao('container-polo')">CAMISA POLO</span>
+        <span onclick="mostrarsecao('container-regatas')">REGATAS</span>
+        <span onclick="mostrarsecao('container-longa')">CAMISA MANGA LONGA</span>
+        <span onclick="mostrarsecao('container-chinelos')">CHINELOS</span>
+        <span onclick="mostrarsecao('container-bermuda')">BERMUDA JEANS</span>
+        <span onclick="mostrarsecao('container-shorts')">SHORTS</span>
+         <span onclick="mostrarsecao('container-tenis')" >TENIS</span>
         <span onclick="mostrarsecao('container-moletons')">MOLETONS</span>
         <span onclick="mostrarsecao('container-acessorios')">ACESSORIOS</span>
+
 
     </nav>
 <section class="section-camisetas cards-Produtos" id="container-camisetas">
@@ -88,6 +123,13 @@
 <section class="section-acessorios cards-Produtos" id="container-acessorios">
 
 </section>
+<section class="section-bone cards-Produtos" id="container-bone"></section>
+<section class="section-polo cards-Produtos" id="container-polo"></section>
+<section class="section-regatas cards-Produtos" id="container-regatas"></section>
+<section class="section-longa cards-Produtos" id="container-longa"></section>
+<section class="section-chinelos cards-Produtos" id="container-chinelos"></section>
+<section class="section-bermuda cards-Produtos" id="container-bermuda"></section>
+<section class="section-shorts cards-Produtos" id="container-shorts"></section>
 <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-logo-texto">

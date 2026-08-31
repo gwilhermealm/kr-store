@@ -88,12 +88,14 @@ header{
   margin-left: 0px;
   padding-left: 50px;
   display: flex;
-  justify-content: center;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
   align-items: center;
   gap: 35px;
   overflow-x: auto;
 }
 .marcas > span{
+  flex: 0 0 auto;
   background-color: var(--cor-primaria);
   color:var(--cor-branca-font) ;
   padding: 5px 15px;
@@ -131,7 +133,8 @@ section{
 
 .img-card {
     width: 100%;       
-    height: 250px;     
+    height: 250px;
+         
     overflow: hidden;   
     background-color: #f9f9f9; 
 }
@@ -142,7 +145,7 @@ section{
     height: 100%;      
     
 
-    object-fit: cover;
+   object-fit: cover;
     object-position: center; 
     display: block;   
 
@@ -153,6 +156,7 @@ section{
 
  .card-produto {
     width: 280px;
+   box-sizing: border-box;
     background: #fff;
     border-radius: 15px;
     box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
@@ -165,7 +169,11 @@ section{
    
 }
 
-.info-card { padding: 20px; }
+.info-card {
+  min-width: 0;
+  padding: 20px;
+  overflow: hidden;
+}
 
 .preco{
   font-size: 2em;
@@ -173,14 +181,21 @@ section{
 .opcao-conteudo {
   display: flex;         /* Coloca os tamanhos lado a lado */
   gap: 8px;              /* Espaçamento entre P, M, G, GG... */
-  width: max-content;    /* AQUI: Força a div a ter exatamente a largura total de todos os botões/textos */
+  width: max-content;    /* Ajusta a largura ao conteúdo */
+  flex: 0 0 auto;
+ 
 }
 
 .opcao {
     display: flex;
     gap: 10px;
     margin-top: 5px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
     overflow-x: auto;
+  overflow-y: hidden;
+  
   
 
   
@@ -257,6 +272,117 @@ section{
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* =========================
+   MENU LATERAL (DRAWER)
+========================= */
+
+/* Overlay de fundo escuro */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.menu-overlay.hidden {
+    display: none;
+    opacity: 0;
+}
+
+/* Base do Menu Lateral (Abre da esquerda) */
+#menu-lateral {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100%;
+    background-color: var(--cor-primaria);
+    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Estado Escondido (Recuado para a esquerda) */
+#menu-lateral.hidden {
+    transform: translateX(-100%);
+}
+
+/* Cabeçalho do Menu */
+.menu-header {
+    padding: 20px;
+    background-color: #111;
+    color: var(--cor-branca-font);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--cor-secundaria);
+}
+
+.menu-header h2 {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.menu-header button {
+    background: none;
+    border: none;
+    color: var(--cor-branca-font);
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Links do Menu */
+.menu-links {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.menu-links a {
+    padding: 15px 25px;
+    color: var(--cor-branca-font);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.menu-links a:hover {
+    background-color: #1a1a1a;
+    color: var(--cor-secundaria);
+    border-left: 4px solid var(--cor-secundaria);
+}
+
+.menu {
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* -----------   */
@@ -319,11 +445,13 @@ span{
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
 
-  animation: slide 12s infinite;
+  animation: slide 8s ease-in-out infinite;
+  animation-fill-mode: both;
   transform: translateX(100%);
 
 }
@@ -337,17 +465,13 @@ span{
   background-image: url(imagens/slide2-desktop.jpg);
   animation-delay: 4s;
   background-size: cover;
-}
-.slider figure:nth-child(3){
-  background-image: url(imagens/slide3-desktop.jpg);
-  animation-delay: 8s;
-  background-size: cover;
+  
 }
 @keyframes slide {
   0% {transform: translateX(100%);}
   5% {transform: translateX(0%);}
-  33% {transform: translateX(0%);}
-  38% {transform: translateX(-100%);}
+  50% {transform: translateX(0%);}
+  55% {transform: translateX(-100%);}
   100% {transform: translateX(-100%);}
 
 }
@@ -356,6 +480,7 @@ span{
   position: absolute;
   width: 100%;
   height: 100%;
+  z-index: 0;
   background: #000000;
 }
 
@@ -586,11 +711,4 @@ span{
   animation-delay: 4s;
   background-position: center center;
 }
-.slider figure:nth-child(3){
-  background-image: url(imagens/slide3-mobile.jpg);
-  animation-delay: 8s;
-  background-size: cover;
-}
-
-    
 }

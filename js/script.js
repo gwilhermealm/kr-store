@@ -2,6 +2,24 @@
 
 let valorcarrinho =0
 
+//menu lateral
+function abrirFecharMenu() {
+    const menu = document.getElementById('menu-lateral');
+    const overlay = document.getElementById('overlay-menu');
+    
+    if (menu && overlay) {
+        menu.classList.toggle('hidden');
+        overlay.classList.toggle('hidden');
+    }
+}
+
+
+
+
+
+
+
+
 //redenrizaçao de produtos
 async function renderizarProdutos() {
     const containers = {
@@ -9,7 +27,14 @@ async function renderizarProdutos() {
     'tenis': document.getElementById('container-tenis'),
     'calcas': document.getElementById('container-calcas'),
     'acessorios': document.getElementById('container-acessorios'),
-    'moletons': document.getElementById('container-moletons')
+    'moletons': document.getElementById('container-moletons'),
+    'bone': document.getElementById('container-bone'),
+    'polo': document.getElementById('container-polo'),
+    'regatas': document.getElementById('container-regatas'),
+    'longa': document.getElementById('container-longa'),
+    'chinelos': document.getElementById('container-chinelos'),
+    'bermuda': document.getElementById('container-bermuda'),
+    'shorts': document.getElementById('container-shorts')
 };
 
     const [produtosResult, tamanhosResult] = await Promise.all([
@@ -41,11 +66,18 @@ async function renderizarProdutos() {
 
     const categoriaProdutoParaTabela = {
         camisetas: 'camisas',
-        calcas: 'camisas',
+        calcas: 'calca',
         moleton: 'moletons',
         moletons: 'moletons',
         tenis: 'sapatos',
         acessorios: 'acessorio',
+        bone: 'acessorio',
+        chinelos: 'sapatos',
+        polo: 'camisas',
+        longa: 'camisas',
+        bermuda:'Bermuda',
+        shorts:'shorts'
+
        
     };
 

@@ -36,7 +36,11 @@ if (!nome || !preco || !categoria || !fotoArquivo) {
 }
 try {
         // 1. Upload da Foto para o Supabase Storage
-        const nomeArquivo = `${Date.now()}_${fotoArquivo.name}`;
+        const nomeArquivoSeguro = fotoArquivo.name
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9._-]/g, '_');
+        const nomeArquivo = `${Date.now()}_${nomeArquivoSeguro}`;
         const { data: uploadData, error: uploadError } = await db.storage
             .from('produtos-imagens') // Nome do seu bucket no Supabase
             .upload(nomeArquivo, fotoArquivo);
