@@ -576,20 +576,20 @@ span{
   width: 90%;
   max-width: 350px;
 }
-slider figure:nth-child(1){
+.slider figure:nth-child(1){
   background-image: url(imagens/slide1-mobile.jpg);
   animation-delay: 0s;
-  background-position: center center;
   background-size: cover;
 }
 .slider figure:nth-child(2){
-  background-image: url(imagens/slide2-mobile.jpg);
+  background-image: url(imagens/slide2-mobile.jpeg);
   animation-delay: 4s;
   background-position: center center;
 }
 .slider figure:nth-child(3){
   background-image: url(imagens/slide3-mobile.jpg);
   animation-delay: 8s;
+  background-size: cover;
 }
 
     
