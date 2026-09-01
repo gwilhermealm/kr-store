@@ -102,6 +102,9 @@
         <div class="menu-item" data-target="section-estoque">
         <span class="material-symbols-outlined">inventory</span>      Estoque
         </div>
+        <div class="menu-item" data-target="section-editar">
+           <span class="material-symbols-outlined">edit</span> Editar Produto
+       </div>
         <div class="menu-item" style="margin-top: auto; background: #1a1f2e;" onclick="handleLogout()">
             <span class="material-symbols-outlined">logout</span> Sair
         </div>
@@ -184,7 +187,55 @@
             </button>
       </form>
 </section>
+<!--editar produto-->
+<section class="card-admin" id="section-editar">
+    <h3><span class="material-symbols-outlined" style="vertical-align: middle;">edit</span> Editar / Excluir Produto</h3>
+    <form class="form-admin">
+        <div class="form-group full-width">
+            <label>Selecionar Produto</label>
+            <select id="select-editar-produto" onchange="carregarDadosEdicao(this.value)">
+                <option value="">Carregando produtos...</option>
+            </select>
+        </div>
 
+        <!-- Visualização das Fotos (Atual vs Nova) -->
+       <div class="form-group full-width container-fotos-editar">
+            <div class="box-foto-preview">
+                <span class="titulo-foto">Foto Atual</span>
+                <div class="img-preview-container">
+                    <img id="preview-foto-atual" src="" alt="Foto Atual" style="display: none;">
+                </div>
+            </div>
+            <div class="box-foto-preview">
+                <span class="titulo-foto">Nova Foto (Opcional)</span>
+                <div class="img-preview-container">
+                    <img id="preview-foto-nova" src="" alt="Nova Foto" style="display: none;">
+                </div>
+            </div>
+       </div>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Novo Nome do Produto</label>
+            <input type="text" id="edit-nome-produto" placeholder="Digite o novo nome do produto">
+        </div>
+
+        <div class="form-group full-width">
+            <label>Substituir Foto (Opcional)</label>
+            <input type="file" id="edit-foto-produto" accept="image/*" style="padding: 7px;" onchange="previewNovaImagem(event)">
+        </div>
+
+        <!-- Botões de Ação (Salvar / Deletar) -->
+        <div class="form-group full-width botoes-acao-container">
+            <button type="button" class="btn-salvar" style="background-color: var(--cor-primaria);" onclick="handleEditProduct()">
+                Salvar Alterações
+            </button>
+            <button type="button" class="btn-deletar" onclick="handleDeleteProduct()">
+                <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 18px;">delete</span> Excluir Produto
+            </button>
+        </div>
+    </form>
+</section>
     </main>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  <script src="js/config-supabase.js"></script>
